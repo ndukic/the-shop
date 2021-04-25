@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace TheShop
+namespace TheShop.Domain
 {
 	public class ShopService
 	{

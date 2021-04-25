@@ -1,4 +1,5 @@
 ﻿using System;
+using TheShop.Domain;
 
 namespace TheShop
 {
