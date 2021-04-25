@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using TheShop.Domain.Model;
 
 namespace TheShop.Domain
 {
@@ -32,19 +33,19 @@ namespace TheShop.Domain
 			if (articleExists)
 			{
 				tempArticle = Supplier1.GetArticle(id);
-				if (maxExpectedPrice < tempArticle.ArticlePrice)
+				if (maxExpectedPrice < tempArticle.Price)
 				{
 					articleExists = Supplier2.ArticleInInventory(id);
 					if (articleExists)
 					{
 						tempArticle = Supplier2.GetArticle(id);
-						if (maxExpectedPrice < tempArticle.ArticlePrice)
+						if (maxExpectedPrice < tempArticle.Price)
 						{
 							articleExists = Supplier3.ArticleInInventory(id);
 							if (articleExists)
 							{
 								tempArticle = Supplier3.GetArticle(id);
-								if (maxExpectedPrice < tempArticle.ArticlePrice)
+								if (maxExpectedPrice < tempArticle.Price)
 								{
 									article = tempArticle;
 								}
@@ -139,8 +140,8 @@ namespace TheShop.Domain
 			return new Article()
 			{
 				ID = 1,
-				Name_of_article = "Article from supplier1",
-				ArticlePrice = 458
+				Name = "Article from supplier1",
+				Price = 458
 			};
 		}
 	}
@@ -157,8 +158,8 @@ namespace TheShop.Domain
 			return new Article()
 			{
 				ID = 1,
-				Name_of_article = "Article from supplier2",
-				ArticlePrice = 459
+				Name = "Article from supplier2",
+				Price = 459
 			};
 		}
 	}
@@ -175,23 +176,10 @@ namespace TheShop.Domain
 			return new Article()
 			{
 				ID = 1,
-				Name_of_article = "Article from supplier3",
-				ArticlePrice = 460
+				Name = "Article from supplier3",
+				Price = 460
 			};
 		}
-	}
-
-	public class Article
-	{
-		public int ID { get; set; }
-
-		public string Name_of_article { get; set; }
-
-		public int ArticlePrice { get; set; }
-		public bool IsSold { get; set; }
-
-		public DateTime SoldDate { get; set; }
-		public int BuyerUserId { get; set; }
 	}
 
 }
