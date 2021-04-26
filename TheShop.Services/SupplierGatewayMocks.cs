@@ -4,12 +4,12 @@ namespace TheShop.Services
 {
     public class SupplierGatewayMock1 : ISupplierGateway
     {
-        public bool IsArticleInInventory(int id)
+        public bool IsArticleInInventory(long id)
         {
             return true;
         }
 
-        public Article GetArticle(int id)
+        public Article GetArticle(long id)
         {
             return new Article()
             {
@@ -22,12 +22,12 @@ namespace TheShop.Services
 
     public class SupplierGatewayMock2 : ISupplierGateway
     {
-        public bool IsArticleInInventory(int id)
+        public bool IsArticleInInventory(long id)
         {
             return true;
         }
 
-        public Article GetArticle(int id)
+        public Article GetArticle(long id)
         {
             return new Article()
             {
@@ -40,12 +40,12 @@ namespace TheShop.Services
 
     public class SupplierGatewayMock3 : ISupplierGateway
     {
-        public bool IsArticleInInventory(int id)
+        public bool IsArticleInInventory(long id)
         {
             return true;
         }
 
-        public Article GetArticle(int id)
+        public Article GetArticle(long id)
         {
             return new Article()
             {
@@ -58,12 +58,12 @@ namespace TheShop.Services
 
     public class SupplierGatewayMock4 : ISupplierGateway
     {
-        public bool IsArticleInInventory(int id)
+        public bool IsArticleInInventory(long id)
         {
             return true;
         }
 
-        public Article GetArticle(int id)
+        public Article GetArticle(long id)
         {
             return new Article()
             {

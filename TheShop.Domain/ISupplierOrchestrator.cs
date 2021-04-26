@@ -4,7 +4,7 @@ namespace TheShop.Domain
 {
     public interface ISupplierOrchestrator
     {
-        bool IsArticleInInventory(int id);
-        Article GetArticle(int id, int maxExpectedPrice);
+        bool IsArticleInInventory(long id);
+        Article GetArticle(long id, double maxExpectedPrice);
     }
 }

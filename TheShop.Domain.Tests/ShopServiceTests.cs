@@ -72,7 +72,7 @@ namespace TheShop.Domain.Tests
 
         private void Arrange_Exception_On_GetArticle()
         {
-            _supplierOrchestrator.Setup(x => x.GetArticle(It.IsAny<int>(), It.IsAny<int>())).Throws(new ArticleNotFoundException());
+            _supplierOrchestrator.Setup(x => x.GetArticle(It.IsAny<long>(), It.IsAny<double>())).Throws(new ArticleNotFoundException());
         }
         
         private Article CreateArticle()

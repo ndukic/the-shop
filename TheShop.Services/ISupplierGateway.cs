@@ -4,7 +4,7 @@ namespace TheShop.Services
 {
     public interface ISupplierGateway
     {
-        bool IsArticleInInventory(int id);
-        Article GetArticle(int id);
+        bool IsArticleInInventory(long id);
+        Article GetArticle(long id);
     }
 }

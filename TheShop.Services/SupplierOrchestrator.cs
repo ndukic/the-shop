@@ -19,12 +19,12 @@ namespace TheShop.Services
             _supplierGateways = supplierGateways;
         }
 
-        public bool IsArticleInInventory(int id)
+        public bool IsArticleInInventory(long id)
         {
             return AtLeastOneSupplierHaveAvailableArticle(id);
         }
 
-        public Article GetArticle(int id, int maxPrice)
+        public Article GetArticle(long id, double maxPrice)
         {
             var articles = GetAvailableArticles(id);
             articles = SelectArticlesWithinExpectedPrice(articles, maxPrice);
@@ -35,7 +35,7 @@ namespace TheShop.Services
             return article;
         }
 
-        private bool AtLeastOneSupplierHaveAvailableArticle(int id)
+        private bool AtLeastOneSupplierHaveAvailableArticle(long id)
         {
             _logger.LogInformation($"Querying over suppliers for article id: {id}");
             foreach (var supplierGateway in _supplierGateways)
@@ -51,7 +51,7 @@ namespace TheShop.Services
             return false;
         }
 
-        private IEnumerable<Article> GetAvailableArticles(int id)
+        private IEnumerable<Article> GetAvailableArticles(long id)
         {
             _logger.LogInformation($"Collecting articles with id:{id} from all suppliers");
 
@@ -69,7 +69,7 @@ namespace TheShop.Services
             return list;
         }
 
-        private IEnumerable<Article> SelectArticlesWithinExpectedPrice(IEnumerable<Article> articles, int maxPrice)
+        private IEnumerable<Article> SelectArticlesWithinExpectedPrice(IEnumerable<Article> articles, double maxPrice)
         {
             return articles.Where(a => a.Price <= maxPrice);
         }
@@ -79,7 +79,7 @@ namespace TheShop.Services
             return articles.FirstOrDefault(a => a.Price == articles.Min(cheapest => cheapest.Price));
         }
 
-        private void AssureArticleExists(Article article, int id, int maxPrice)
+        private void AssureArticleExists(Article article, long id, double maxPrice)
         {
             if (article == null)
             {
