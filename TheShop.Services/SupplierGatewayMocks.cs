@@ -13,7 +13,7 @@ namespace TheShop.Services
         {
             return new Article()
             {
-                ID = 1,
+                Id = 1,
                 Name = "Article from supplier1",
                 Price = 458
             };
@@ -31,7 +31,7 @@ namespace TheShop.Services
         {
             return new Article()
             {
-                ID = 1,
+                Id = 1,
                 Name = "Article from supplier2",
                 Price = 459
             };
@@ -49,7 +49,7 @@ namespace TheShop.Services
         {
             return new Article()
             {
-                ID = 1,
+                Id = 1,
                 Name = "Article from supplier3",
                 Price = 460
             };
@@ -67,7 +67,7 @@ namespace TheShop.Services
         {
             return new Article()
             {
-                ID = 1,
+                Id = 1,
                 Name = "Article from supplier4",
                 Price = 4
             };

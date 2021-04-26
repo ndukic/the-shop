@@ -11,7 +11,7 @@ namespace TheShop.Dal.InMemory
 
 		public Article GetById(int id)
 		{
-			return _articles.Single(x => x.ID == id);
+			return _articles.Single(x => x.Id == id);
 		}
 
 		public void Save(Article article)

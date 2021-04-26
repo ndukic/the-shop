@@ -5,6 +5,6 @@ namespace TheShop.Domain
     public interface ISupplierOrchestrator
     {
         bool IsArticleInInventory(int id);
-        IArticle GetArticle(int id, int maxExpectedPrice);
+        Article GetArticle(int id, int maxExpectedPrice);
     }
 }

@@ -2,9 +2,9 @@
 
 namespace TheShop.Domain.Model
 {
-    public class Article : IArticle
+    public class Article
     {
-		public int ID { get; set; }
+		public int Id { get; set; }
 		public string Name { get; set; }
 		public int Price { get; set; }
 		public bool IsSold { get; set; }

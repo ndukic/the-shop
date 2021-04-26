@@ -1,7 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using TheShop.Domain;
+using TheShop.Domain.Exceptions;
 using TheShop.Domain.Model;
 
 namespace TheShop.Services
@@ -34,33 +35,39 @@ namespace TheShop.Services
             return false;
         }
 
-        public IArticle GetArticle(int id, int maxExpectedPrice)
+        public Article GetArticle(int id, int maxExpectedPrice)
         {
-            Article article = null;
+            var articles = GetAvailableArticles(id);
+
+            var article = articles
+                .Where(a => a.Price <= maxExpectedPrice)
+                .FirstOrDefault(a => a.Price == articles.Min(cheapest => cheapest.Price));
+
+            if (article == null)
+            {
+                _logger.LogWarning($"Article with id:{id} and price limit:{maxExpectedPrice} is not found");
+                throw new ArticleNotFoundException($"Article with id:{id} and price limit:{maxExpectedPrice} is not found");
+            }
+
+            return article;
+        }
+
+        private List<Article> GetAvailableArticles(int id)
+        {
+            _logger.LogInformation($"Collecting articles with id:{id} from all suppliers");
+
+            var list = new List<Article>();
             foreach (var supplierGateway in _supplierGateways)
             {
                 bool articleExists = supplierGateway.IsArticleInInventory(id);
                 if (articleExists)
                 {
-                    var articleCandidate = supplierGateway.GetArticle(id);
-                    bool isPriceLessThanMax = articleCandidate.Price <= maxExpectedPrice;
-                    if (isPriceLessThanMax)
-                    {
-                        bool isPriceBetterThanCurrentBest = article == null || articleCandidate.Price < article.Price;
-                        if (isPriceBetterThanCurrentBest)
-                        {
-                            article = articleCandidate;
-                        }
-                    }
+                    var article = supplierGateway.GetArticle(id);
+                    list.Add(article);
                 }
             }
 
-            if (article == null)
-            {
-                return new ArticleNotFound();
-            }
-
-            return article;
+            return list;
         }
     }
 }
