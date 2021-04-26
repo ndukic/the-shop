@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using TheShop.Domain;
 
 namespace TheShop.TheClient
 {
     public class Client
     {
-        public static void UseShopService(IShopService shopService)
+        public static void UseShopService(ILogger logger, IShopService shopService)
         {
 			try
 			{
@@ -14,29 +15,29 @@ namespace TheShop.TheClient
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine(ex);
+				logger.LogWarning(ex, "OrderAndSellArticle failed");
 			}
 
 			try
 			{
 				//print article on console
 				var article = shopService.GetById(1);
-				Console.WriteLine("Found article with ID: " + article.ID);
+				logger.LogInformation("Found article with ID: " + article.ID);
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine("Article not found: " + ex);
+				logger.LogWarning("Article not found: " + ex);
 			}
 
 			try
 			{
 				//print article on console				
 				var article = shopService.GetById(12);
-				Console.WriteLine("Found article with ID: " + article.ID);
+				logger.LogInformation("Found article with ID: " + article.ID);
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine("Article not found: " + ex);
+				logger.LogWarning("Article not found: " + ex);
 			}
 
 			Console.ReadKey();

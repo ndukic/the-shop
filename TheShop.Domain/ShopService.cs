@@ -1,21 +1,23 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using TheShop.Domain.Model;
 
 namespace TheShop.Domain
 {
     public class ShopService : IShopService
 	{
+		private ILogger<ShopService> _logger;
 		private IDatabaseDriver _databaseDriver;
-		private Logger logger;
 
 		private Supplier1 Supplier1;
 		private Supplier2 Supplier2;
 		private Supplier3 Supplier3;
 
-		public ShopService(IDatabaseDriver databaseDriver)
+		public ShopService(ILogger<ShopService> logger,
+			IDatabaseDriver databaseDriver)
 		{
+			_logger = logger;
 			_databaseDriver = databaseDriver;
-			logger = new Logger();
 			Supplier1 = new Supplier1();
 			Supplier2 = new Supplier2();
 			Supplier3 = new Supplier3();
@@ -63,7 +65,7 @@ namespace TheShop.Domain
 				throw new Exception("Could not order article");
 			}
 
-			logger.Debug("Trying to sell article with id=" + id);
+			_logger.LogDebug("Trying to sell article with id=" + id);
 
 			article.IsSold = true;
 			article.SoldDate = DateTime.Now;
@@ -72,11 +74,11 @@ namespace TheShop.Domain
 			try
 			{
 				_databaseDriver.Save(article);
-				logger.Info("Article with id=" + id + " is sold.");
+				_logger.LogInformation("Article with id=" + id + " is sold.");
 			}
 			catch (ArgumentNullException ex)
 			{
-				logger.Error("Could not save article with id=" + id);
+				_logger.LogError("Could not save article with id=" + id);
 				throw new Exception("Could not save article with id");
 			}
 			catch (Exception)
@@ -89,24 +91,6 @@ namespace TheShop.Domain
 		public Article GetById(int id)
 		{
 			return _databaseDriver.GetById(id);
-		}
-	}
-
-	public class Logger
-	{
-		public void Info(string message)
-		{
-			Console.WriteLine("Info: " + message);
-		}
-
-		public void Error(string message)
-		{
-			Console.WriteLine("Error: " + message);
-		}
-
-		public void Debug(string message)
-		{
-			Console.WriteLine("Debug: " + message);
 		}
 	}
 
