@@ -7,7 +7,7 @@ namespace TheShop.Dal.InMemory
     {
         public static void Configure(IServiceCollection services)
         {
-            services.AddSingleton<IDatabaseDriver, DatabaseDriver>();
+            services.AddSingleton<IDatabaseDriver, DatabaseInMemoryDriver>();
         }
     }
 }

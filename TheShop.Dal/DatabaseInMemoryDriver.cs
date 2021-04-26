@@ -5,14 +5,14 @@ using TheShop.Domain.Model;
 
 namespace TheShop.Dal.InMemory
 {
-    public class DatabaseDriver : IDatabaseDriver
+    public class DatabaseInMemoryDriver : IDatabaseDriver
     {
 		private List<Article> _articles = new List<Article>();
         private List<Order> _orders = new List<Order>();
 
         public Article GetById(long id)
 		{
-			return _articles.Single(x => x.Id == id);
+			return _articles.FirstOrDefault(x => x.Id == id);
 		}
 
         public void Save(Article article)
