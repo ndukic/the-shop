@@ -7,16 +7,16 @@ namespace TheShop.Domain
 {
 	public class ShopService
 	{
-		private DatabaseDriver DatabaseDriver;
+		private IDatabaseDriver _databaseDriver;
 		private Logger logger;
 
 		private Supplier1 Supplier1;
 		private Supplier2 Supplier2;
 		private Supplier3 Supplier3;
 
-		public ShopService()
+		public ShopService(IDatabaseDriver databaseDriver)
 		{
-			DatabaseDriver = new DatabaseDriver();
+			_databaseDriver = databaseDriver;
 			logger = new Logger();
 			Supplier1 = new Supplier1();
 			Supplier2 = new Supplier2();
@@ -73,7 +73,7 @@ namespace TheShop.Domain
 
 			try
 			{
-				DatabaseDriver.Save(article);
+				_databaseDriver.Save(article);
 				logger.Info("Article with id=" + id + " is sold.");
 			}
 			catch (ArgumentNullException ex)
@@ -90,23 +90,7 @@ namespace TheShop.Domain
 
 		public Article GetById(int id)
 		{
-			return DatabaseDriver.GetById(id);
-		}
-	}
-
-	//in memory implementation
-	public class DatabaseDriver
-	{
-		private List<Article> _articles = new List<Article>();
-
-		public Article GetById(int id)
-		{
-			return _articles.Single(x => x.ID == id);
-		}
-
-		public void Save(Article article)
-		{
-			_articles.Add(article);
+			return _databaseDriver.GetById(id);
 		}
 	}
 

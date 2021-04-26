@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
+using TheShop.Dal.InMemory;
 using TheShop.Domain;
 
 namespace TheShop
@@ -7,8 +9,17 @@ namespace TheShop
 	{
 		private static void Main(string[] args)
 		{
-			var shopService = new ShopService();
+			var serviceProvider = new ServiceCollection()
+				.AddSingleton<IDatabaseDriver, DatabaseDriver>()
+				.AddSingleton<ShopService>()
+				.BuildServiceProvider();
 
+			var shopService = serviceProvider.GetService<ShopService>();
+			ClientSequence(shopService);
+		}
+
+		private static void ClientSequence(ShopService shopService)
+        {
 			try
 			{
 				//order and sell
