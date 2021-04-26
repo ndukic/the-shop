@@ -45,21 +45,29 @@ namespace TheShop.Domain.Tests
         }
 
         [Test]
-        public void Saves_Article_On_Successful_Sale()
+        public void Saves_Order_On_Successful_Sale()
         {
             var article = CreateArticle();
-            var article2 = CreateArticle();
 
             _sut.TrySellArticle(article, 555);
 
-            _databaseDriver.Verify(x => x.Save(article), Times.Once());
-            _databaseDriver.Verify(x => x.Save(article2), Times.Never());
+            _databaseDriver.Verify(x => x.Save(It.IsAny<Order>()), Times.Once());
         }
 
         [Test]
         public void Throws_ArgumentNullException_On_Null_Article_Save()
         {
             Assert.Throws<NullReferenceException>(() => _sut.TrySellArticle(null, 321));
+        }
+
+        [Test]
+        public void Return_Null_When_Get_NonExisting_Article()
+        {
+            _databaseDriver.Setup(x => x.GetById(6)).Returns((Article)null);
+
+            var actualResult = _sut.GetById(6);
+
+            Assert.IsNull(actualResult);
         }
 
         private void Arrange_Exception_On_GetArticle()

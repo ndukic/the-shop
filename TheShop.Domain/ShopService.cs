@@ -48,19 +48,17 @@ namespace TheShop.Domain
         {
 			_logger.LogDebug($"Trying to sell article with id:{article.Id} to buyer with id:{buyerId}");
 
-            article.IsSold = true;
-            article.SoldDate = DateTime.Now;
-            article.BuyerUserId = buyerId;
+			var order = CreateOrder(article, buyerId);
 
-            try
+			try
             {
-                _databaseDriver.Save(article);
-                _logger.LogInformation($"Article with id={article.Id} is sold.");
+                _databaseDriver.Save(order);
+                _logger.LogInformation($"Article with id:{article.Id} is sold. Order id:{order.Id}");
             }
             catch (ArgumentNullException ex)
             {
-                _logger.LogError("Could not save article with id=" + article.Id);
-                throw new Exception("Could not save article with id");
+                _logger.LogError($"Could not save order");
+                throw new Exception("Could not save order");
             }
             catch (Exception)
             {
@@ -70,6 +68,17 @@ namespace TheShop.Domain
 		public Article GetById(int id)
 		{
 			return _databaseDriver.GetById(id);
+		}
+
+		private Order CreateOrder(Article article, long buyerId)
+        {
+			return new Order()
+			{
+				ArticleId = article.Id,
+				Price = article.Price,
+				BuyerId = buyerId,
+				CreatedDate = DateTime.Now
+			};
 		}
 	}
 }

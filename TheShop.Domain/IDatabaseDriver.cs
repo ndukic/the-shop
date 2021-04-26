@@ -4,7 +4,10 @@ namespace TheShop.Domain
 {
     public interface IDatabaseDriver
     {
-		Article GetById(int id);
+		Article GetById(long id);
 		void Save(Article article);
+
+		Order GetOrderById(long id);
+		void Save(Order order);
 	}
 }
