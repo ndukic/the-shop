@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using TheShop.Domain.Model;
 
 namespace TheShop.Domain
 {
-	public class ShopService
+    public class ShopService : IShopService
 	{
 		private IDatabaseDriver _databaseDriver;
 		private Logger logger;

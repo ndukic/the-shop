@@ -12,6 +12,7 @@
   <ItemGroup>
     <ProjectReference Include="..\TheShop.Dal\TheShop.Dal.InMemory.csproj" />
     <ProjectReference Include="..\TheShop.Domain\TheShop.Domain.csproj" />
+    <ProjectReference Include="..\TheShop.TheClient\TheShop.TheClient.csproj" />
   </ItemGroup>
 
 </Project>
