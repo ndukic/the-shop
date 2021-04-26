@@ -52,7 +52,8 @@ namespace TheShop.Domain
 
 			try
             {
-                _databaseDriver.Save(order);
+				_databaseDriver.Save(article);
+				_databaseDriver.Save(order);
                 _logger.LogInformation($"Article with id:{article.Id} is sold. Order id:{order.Id}");
             }
             catch (ArgumentNullException ex)

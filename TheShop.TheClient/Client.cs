@@ -22,22 +22,22 @@ namespace TheShop.TheClient
 			{
 				//print article on console
 				var article = shopService.GetById(1);
-				logger.LogInformation("Found article with ID: " + article.Id);
+				logger.LogInformation($"Found article with ID:{article.Id}");
 			}
 			catch (Exception ex)
 			{
-				logger.LogWarning("Article not found: " + ex);
+				logger.LogWarning($"Article not found: {ex}");
 			}
 
 			try
 			{
 				//print article on console				
 				var article = shopService.GetById(12);
-				logger.LogInformation("Found article with ID: " + article.Id);
+				logger.LogInformation($"Found article with ID:{article.Id}");
 			}
 			catch (Exception ex)
 			{
-				logger.LogWarning("Article not found: " + ex);
+				logger.LogWarning($"Article not found: {ex}");
 			}
 
 			Console.ReadKey();
