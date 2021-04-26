@@ -21,6 +21,22 @@ namespace TheShop.Services
 
         public bool IsArticleInInventory(int id)
         {
+            return AtLeastOneSupplierHaveAvailableArticle(id);
+        }
+
+        public Article GetArticle(int id, int maxPrice)
+        {
+            var articles = GetAvailableArticles(id);
+            articles = SelectArticlesWithinExpectedPrice(articles, maxPrice);
+            var article = SelectCheapestArticle(articles);
+
+            AssureArticleExists(article, id, maxPrice);
+
+            return article;
+        }
+
+        private bool AtLeastOneSupplierHaveAvailableArticle(int id)
+        {
             _logger.LogInformation($"Querying over suppliers for article id: {id}");
             foreach (var supplierGateway in _supplierGateways)
             {
@@ -35,24 +51,7 @@ namespace TheShop.Services
             return false;
         }
 
-        public Article GetArticle(int id, int maxExpectedPrice)
-        {
-            var articles = GetAvailableArticles(id);
-
-            var article = articles
-                .Where(a => a.Price <= maxExpectedPrice)
-                .FirstOrDefault(a => a.Price == articles.Min(cheapest => cheapest.Price));
-
-            if (article == null)
-            {
-                _logger.LogWarning($"Article with id:{id} and price limit:{maxExpectedPrice} is not found");
-                throw new ArticleNotFoundException($"Article with id:{id} and price limit:{maxExpectedPrice} is not found");
-            }
-
-            return article;
-        }
-
-        private List<Article> GetAvailableArticles(int id)
+        private IEnumerable<Article> GetAvailableArticles(int id)
         {
             _logger.LogInformation($"Collecting articles with id:{id} from all suppliers");
 
@@ -68,6 +67,25 @@ namespace TheShop.Services
             }
 
             return list;
+        }
+
+        private IEnumerable<Article> SelectArticlesWithinExpectedPrice(IEnumerable<Article> articles, int maxPrice)
+        {
+            return articles.Where(a => a.Price <= maxPrice);
+        }
+
+        private Article SelectCheapestArticle(IEnumerable<Article> articles)
+        {
+            return articles.FirstOrDefault(a => a.Price == articles.Min(cheapest => cheapest.Price));
+        }
+
+        private void AssureArticleExists(Article article, int id, int maxPrice)
+        {
+            if (article == null)
+            {
+                _logger.LogWarning($"Article with id:{id} and price limit:{maxPrice} is not found");
+                throw new ArticleNotFoundException($"Article with id:{id} and price limit:{maxPrice} is not found");
+            }
         }
     }
 }
