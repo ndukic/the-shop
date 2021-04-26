@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using TheShop.Dal.InMemory;
 using TheShop.Domain;
+using TheShop.Services;
 using TheShop.TheClient;
 
 namespace TheShop
@@ -41,10 +42,11 @@ namespace TheShop
 
 		private static void ConfigureServices(IServiceCollection services)
         {
-			services.AddLogging(configure => configure.AddSerilog())
-					.AddSingleton<IShopService, ShopService>()
-					.AddSingleton<IDatabaseDriver, DatabaseDriver>();
+			services.AddLogging(configure => configure.AddSerilog());
 
+			ConfigureDal.Configure(services);
+			ConfigureShopServices.Configure(services);
+			ConfigureDomain.Configure(services);
 		}
 	}
 }

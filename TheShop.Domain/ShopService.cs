@@ -6,64 +6,37 @@ namespace TheShop.Domain
 {
     public class ShopService : IShopService
 	{
-		private ILogger<ShopService> _logger;
-		private IDatabaseDriver _databaseDriver;
-
-		private Supplier1 Supplier1;
-		private Supplier2 Supplier2;
-		private Supplier3 Supplier3;
+		private readonly ILogger<ShopService> _logger;
+		private readonly IDatabaseDriver _databaseDriver;
+		private readonly ISupplierOrchestrator _supplierOrchestrator;
 
 		public ShopService(ILogger<ShopService> logger,
-			IDatabaseDriver databaseDriver)
+			IDatabaseDriver databaseDriver,
+			ISupplierOrchestrator supplierOrchestrator)
 		{
 			_logger = logger;
 			_databaseDriver = databaseDriver;
-			Supplier1 = new Supplier1();
-			Supplier2 = new Supplier2();
-			Supplier3 = new Supplier3();
+			_supplierOrchestrator = supplierOrchestrator;
 		}
 
 		public void OrderAndSellArticle(int id, int maxExpectedPrice, int buyerId)
 		{
 			#region ordering article
 
-			Article article = null;
-			Article tempArticle = null;
-			var articleExists = Supplier1.ArticleInInventory(id);
-			if (articleExists)
-			{
-				tempArticle = Supplier1.GetArticle(id);
-				if (maxExpectedPrice < tempArticle.Price)
-				{
-					articleExists = Supplier2.ArticleInInventory(id);
-					if (articleExists)
-					{
-						tempArticle = Supplier2.GetArticle(id);
-						if (maxExpectedPrice < tempArticle.Price)
-						{
-							articleExists = Supplier3.ArticleInInventory(id);
-							if (articleExists)
-							{
-								tempArticle = Supplier3.GetArticle(id);
-								if (maxExpectedPrice < tempArticle.Price)
-								{
-									article = tempArticle;
-								}
-							}
-						}
-					}
-				}
-			}
+			IArticle tempArticle = null;
 
-			article = tempArticle;
+			tempArticle = _supplierOrchestrator.GetArticle(id, maxExpectedPrice);
+
 			#endregion
 
 			#region selling article
 
-			if (article == null)
+			if (tempArticle is ArticleNotFound)
 			{
 				throw new Exception("Could not order article");
 			}
+
+			var article = (Article)tempArticle;
 
 			_logger.LogDebug("Trying to sell article with id=" + id);
 
@@ -93,59 +66,4 @@ namespace TheShop.Domain
 			return _databaseDriver.GetById(id);
 		}
 	}
-
-	public class Supplier1
-	{
-		public bool ArticleInInventory(int id)
-		{
-			return true;
-		}
-
-		public Article GetArticle(int id)
-		{
-			return new Article()
-			{
-				ID = 1,
-				Name = "Article from supplier1",
-				Price = 458
-			};
-		}
-	}
-
-	public class Supplier2
-	{
-		public bool ArticleInInventory(int id)
-		{
-			return true;
-		}
-
-		public Article GetArticle(int id)
-		{
-			return new Article()
-			{
-				ID = 1,
-				Name = "Article from supplier2",
-				Price = 459
-			};
-		}
-	}
-
-	public class Supplier3
-	{
-		public bool ArticleInInventory(int id)
-		{
-			return true;
-		}
-
-		public Article GetArticle(int id)
-		{
-			return new Article()
-			{
-				ID = 1,
-				Name = "Article from supplier3",
-				Price = 460
-			};
-		}
-	}
-
 }

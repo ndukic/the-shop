@@ -2,7 +2,7 @@
 
 namespace TheShop.Domain.Model
 {
-    public class Article
+    public class Article : IArticle
     {
 		public int ID { get; set; }
 		public string Name { get; set; }
