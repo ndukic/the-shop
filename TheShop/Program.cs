@@ -1,9 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Serilog;
-using TheShop.Dal.InMemory;
-using TheShop.Domain;
-using TheShop.Services;
+using System;
 using TheShop.TheClient;
 
 namespace TheShop
@@ -12,41 +9,17 @@ namespace TheShop
 	{
 		private static void Main(string[] args)
 		{
-			ConfigureLogger();
-
-			var serviceCollection = new ServiceCollection();
-			ConfigureServices(serviceCollection);
-			var serviceProvider = serviceCollection.BuildServiceProvider();
+			var services = Startup.ConfigureServices();
+			var serviceProvider = services.BuildServiceProvider();
 
 			var logger = serviceProvider.GetService<ILogger<Program>>();
 			logger.LogInformation("Application start");
 
-			// Run client example
-			var clientLogger = serviceProvider.GetService<ILogger<Client>>();
-			var shopService = serviceProvider.GetService<IShopService>();
-            Client.UseShopService(clientLogger, shopService);
+			serviceProvider.GetService<Client>().UseShopService();
 
 			logger.LogInformation("Application end");
-		}
 
-		private static void ConfigureLogger()
-        {
-			Log.Logger = new LoggerConfiguration()
-#if DEBUG
-				.MinimumLevel.Debug()
-#endif
-				.WriteTo.File("TheShop.log")
-				.WriteTo.Console()
-				.CreateLogger();
-		}
-
-		private static void ConfigureServices(IServiceCollection services)
-        {
-			services.AddLogging(configure => configure.AddSerilog());
-
-			ConfigureDal.Configure(services);
-			ConfigureShopServices.Configure(services);
-			ConfigureDomain.Configure(services);
+			Console.ReadKey();
 		}
 	}
 }

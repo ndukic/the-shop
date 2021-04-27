@@ -6,41 +6,48 @@ namespace TheShop.TheClient
 {
     public class Client
     {
-        public static void UseShopService(ILogger logger, IShopService shopService)
+		private readonly ILogger<Client> _logger;
+		private readonly IShopService _shopService;
+
+		public Client(ILogger<Client> logger, IShopService shopService)
+        {
+			_logger = logger;
+			_shopService = shopService;
+        }
+
+        public void UseShopService()
         {
 			try
 			{
 				//order and sell
-				shopService.OrderAndSellArticle(1, 20, 10);
+				_shopService.OrderAndSellArticle(1, 20, 10);
 			}
 			catch (Exception ex)
 			{
-				logger.LogWarning(ex, "OrderAndSellArticle failed");
+				_logger.LogWarning(ex, "OrderAndSellArticle failed");
 			}
 
 			try
 			{
-				//print article on console
-				var article = shopService.GetById(1);
-				logger.LogInformation($"Found article with ID:{article.Id}");
+				//print article
+				var article = _shopService.GetById(1);
+				_logger.LogInformation($"Found article with ID:{article.Id}");
 			}
 			catch (Exception ex)
 			{
-				logger.LogWarning($"Article not found: {ex}");
+				_logger.LogWarning($"Article not found: {ex}");
 			}
 
 			try
 			{
-				//print article on console				
-				var article = shopService.GetById(12);
-				logger.LogInformation($"Found article with ID:{article.Id}");
+				//print article				
+				var article = _shopService.GetById(12);
+				_logger.LogInformation($"Found article with ID:{article.Id}");
 			}
 			catch (Exception ex)
 			{
-				logger.LogWarning($"Article not found: {ex}");
+				_logger.LogWarning($"Article not found: {ex}");
 			}
-
-			Console.ReadKey();
 		}
     }
 }

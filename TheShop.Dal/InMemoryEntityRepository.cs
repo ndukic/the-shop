@@ -4,7 +4,7 @@ using TheShop.Domain.Model;
 
 namespace TheShop.Dal.InMemory
 {
-    public abstract class InMemoryEntityRepository<T> : IEntityRepository<T> where T : Entity
+    public class InMemoryEntityRepository<T> : IEntityRepository<T> where T : Entity
     {
         private readonly List<T> _entities = new List<T>();
 
