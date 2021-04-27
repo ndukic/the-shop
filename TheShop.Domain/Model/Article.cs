@@ -1,10 +1,7 @@
-﻿using System;
-
-namespace TheShop.Domain.Model
+﻿namespace TheShop.Domain.Model
 {
-    public class Article
+    public class Article : Entity
     {
-		public long Id { get; set; }
 		public string Name { get; set; }
 		public double Price { get; set; }
 	}

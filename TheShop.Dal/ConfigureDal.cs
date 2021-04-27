@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using TheShop.Domain;
+using TheShop.Domain.Model;
 
 namespace TheShop.Dal.InMemory
 {
@@ -7,7 +8,8 @@ namespace TheShop.Dal.InMemory
     {
         public static void Configure(IServiceCollection services)
         {
-            services.AddSingleton<IDatabaseDriver, DatabaseInMemoryDriver>();
+            services.AddSingleton<IEntityRepository<Article>, InMemoryEntityRepository<Article>>();
+            services.AddSingleton<IEntityRepository<Order>, InMemoryEntityRepository<Order>>();
         }
     }
 }

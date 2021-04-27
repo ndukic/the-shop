@@ -1,22 +1,31 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
+using TheShop.Domain.Commands;
 using TheShop.Domain.Exceptions;
 using TheShop.Domain.Model;
+using TheShop.Domain.Queries;
 
 namespace TheShop.Domain
 {
     public class ShopService : IShopService
 	{
 		private readonly ILogger<ShopService> _logger;
-		private readonly IDatabaseDriver _databaseDriver;
+
 		private readonly ISupplierOrchestrator _supplierOrchestrator;
+		private readonly IArticleCreator _articleCreator;
+		private readonly IArticleReader _articleReader;
+		private readonly IOrderCreator _orderCreator;
 
 		public ShopService(ILogger<ShopService> logger,
-			IDatabaseDriver databaseDriver,
+			IArticleCreator articleCreator,
+			IArticleReader articleReader,
+			IOrderCreator orderCreator,
 			ISupplierOrchestrator supplierOrchestrator)
-		{
+		{	
 			_logger = logger;
-			_databaseDriver = databaseDriver;
+			_articleCreator = articleCreator;
+			_articleReader = articleReader;
+			_orderCreator = orderCreator;
 			_supplierOrchestrator = supplierOrchestrator;
 		}
 
@@ -52,8 +61,8 @@ namespace TheShop.Domain
 
 			try
             {
-				_databaseDriver.Save(article);
-				_databaseDriver.Save(order);
+				_articleCreator.Save(article);
+				_orderCreator.Save(order);
                 _logger.LogInformation($"Article with id:{article.Id} is sold. Order id:{order.Id}");
             }
             catch (ArgumentNullException ex)
@@ -68,7 +77,7 @@ namespace TheShop.Domain
 
 		public Article GetById(int id)
 		{
-			return _databaseDriver.GetById(id);
+			return _articleReader.GetById(id);
 		}
 
 		private Order CreateOrder(Article article, long buyerId)
