@@ -16,7 +16,7 @@ namespace TheShop.Domain.Tests
         private Mock<IArticleCreator> _articleCreator;
         private Mock<IArticleReader> _articleReader;
         private Mock<IOrderCreator> _orderCreator;
-        private Mock<ISupplierOrchestrator> _supplierOrchestrator;
+        private Mock<ISupplierService> _supplierService;
         private ShopService _sut;
 
         [SetUp]
@@ -24,12 +24,12 @@ namespace TheShop.Domain.Tests
         {
             _fixture = new Fixture().Customize(new AutoMoqCustomization());
 
-            _supplierOrchestrator = new Mock<ISupplierOrchestrator>();
+            _supplierService = new Mock<ISupplierService>();
             _articleCreator = new Mock<IArticleCreator>();
             _articleReader = new Mock<IArticleReader>();
             _orderCreator = new Mock<IOrderCreator>();
 
-            _fixture.Inject(_supplierOrchestrator);
+            _fixture.Inject(_supplierService);
             _fixture.Inject(_articleCreator);
             _fixture.Inject(_articleReader);
             _fixture.Inject(_orderCreator);
@@ -90,7 +90,7 @@ namespace TheShop.Domain.Tests
 
         private void Arrange_Exception_On_GetArticle()
         {
-            _supplierOrchestrator.Setup(x => x.GetArticle(It.IsAny<long>(), It.IsAny<double>())).Throws(new ArticleNotFoundException());
+            _supplierService.Setup(x => x.GetArticle(It.IsAny<long>(), It.IsAny<double>())).Throws(new ArticleNotFoundException());
         }
         
         private Article CreateArticle()

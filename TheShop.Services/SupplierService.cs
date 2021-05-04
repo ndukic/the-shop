@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TheShop.Domain;
@@ -7,12 +8,12 @@ using TheShop.Domain.Model;
 
 namespace TheShop.Services
 {
-    public class SupplierOrchestrator : ISupplierOrchestrator
+    public class SupplierService : ISupplierService
     {
-        private readonly ILogger<SupplierOrchestrator> _logger;
+        private readonly ILogger<SupplierService> _logger;
         private readonly IEnumerable<ISupplierGateway> _supplierGateways;
 
-        public SupplierOrchestrator(ILogger<SupplierOrchestrator> logger,
+        public SupplierService(ILogger<SupplierService> logger,
             IEnumerable<ISupplierGateway> supplierGateways)
         {
             _logger = logger;
@@ -86,6 +87,16 @@ namespace TheShop.Services
                 _logger.LogWarning($"Article with id:{id} and price limit:{maxPrice} is not found");
                 throw new ArticleNotFoundException($"Article with id:{id} and price limit:{maxPrice} is not found");
             }
+        }
+
+        public IEnumerable<Article> GetArticles(ArticleQuery articleQuery)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsArticleAvailable(Guid articleRef)
+        {
+            throw new NotImplementedException();
         }
     }
 }

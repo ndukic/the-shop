@@ -11,19 +11,19 @@ namespace TheShop.Services.Tests
     public class SupplierOrchestratorTests
     {
         private IFixture _fixture;
-        private Mock<ILogger<SupplierOrchestrator>> _logger;
+        private Mock<ILogger<SupplierService>> _logger;
         private Mock<IEnumerable<ISupplierGateway>> _supplierGateways;
-        private SupplierOrchestrator _sut;
+        private SupplierService _sut;
 
         [SetUp]
         public void Setup()
         {
             _fixture = new Fixture().Customize(new AutoMoqCustomization());
 
-            _logger = new Mock<ILogger<SupplierOrchestrator>>();
+            _logger = new Mock<ILogger<SupplierService>>();
             _supplierGateways = new Mock<IEnumerable<ISupplierGateway>>();
 
-            _sut = new SupplierOrchestrator(_logger.Object, _supplierGateways.Object);
+            _sut = new SupplierService(_logger.Object, _supplierGateways.Object);
         }
 
         [Test]

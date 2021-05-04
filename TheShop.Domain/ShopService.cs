@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using TheShop.Domain.Commands;
 using TheShop.Domain.Exceptions;
 using TheShop.Domain.Model;
@@ -11,7 +12,7 @@ namespace TheShop.Domain
 	{
 		private readonly ILogger<ShopService> _logger;
 
-		private readonly ISupplierOrchestrator _supplierOrchestrator;
+		private readonly ISupplierService _supplierOrchestrator;
 		private readonly IArticleCreator _articleCreator;
 		private readonly IArticleReader _articleReader;
 		private readonly IOrderCreator _orderCreator;
@@ -20,7 +21,7 @@ namespace TheShop.Domain
 			IArticleCreator articleCreator,
 			IArticleReader articleReader,
 			IOrderCreator orderCreator,
-			ISupplierOrchestrator supplierOrchestrator)
+			ISupplierService supplierOrchestrator)
 		{	
 			_logger = logger;
 			_articleCreator = articleCreator;
@@ -55,7 +56,7 @@ namespace TheShop.Domain
 
 		public void TrySellArticle(Article article, int buyerId)
         {
-			_logger.LogDebug($"Trying to sell article with id:{article.Id} to buyer with id:{buyerId}");
+			_logger.LogDebug($"Trying to sell article with ref:{article.ArticleRef} to customer with id:{buyerId}");
 
 			var order = CreateOrder(article, buyerId);
 
@@ -63,7 +64,7 @@ namespace TheShop.Domain
             {
 				_articleCreator.Save(article);
 				_orderCreator.Save(order);
-                _logger.LogInformation($"Article with id:{article.Id} is sold. Order id:{order.Id}");
+                _logger.LogInformation($"Article with ref:{article.ArticleRef} is sold. Order ref:{order.OrderRef}");
             }
             catch (ArgumentNullException ex)
             {
@@ -84,11 +85,48 @@ namespace TheShop.Domain
         {
 			return new Order()
 			{
-				ArticleId = article.Id,
-				Price = article.Price,
-				BuyerId = buyerId,
 				CreatedDate = DateTime.Now
 			};
 		}
-	}
+
+        public IEnumerable<Article> GetArticles(ArticleQuery query)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AddArticleToBasket(Article article, int count, Guid customerRef)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemoveBasketItem(Guid basketItemRef)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void EditBasketItem(BasketItem basketItem)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Basket GetBasket(Guid customerRef)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ClearBasket(Guid customerRef)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void CreateOrder(Guid customerRef)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Order GetOrder(Guid orderRef)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

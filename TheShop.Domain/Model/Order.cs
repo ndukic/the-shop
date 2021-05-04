@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace TheShop.Domain.Model
 {
-    public class Order : Entity
+    public class Order
     {
-        public long ArticleId { get; set; }
-        public long BuyerId { get; set; }
-        public double Price { get; set; }
+        public Guid OrderRef { get; set; }
+        public Guid CustomerRef { get; set; }
+        public double TotalPrice { get; set; }
         public DateTime CreatedDate { get; set; }
+        public OrderState OrderState { get; set; }
+        public IEnumerable<OrderItem> OrderItems { get; set; }
     }
 }

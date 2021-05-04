@@ -7,7 +7,7 @@ namespace TheShop.Services
     {
         public static void Configure(IServiceCollection services)
         {
-            services.AddSingleton<ISupplierOrchestrator, SupplierOrchestrator>();
+            services.AddSingleton<ISupplierService, SupplierService>();
             services.AddSingleton<ISupplierGateway, SupplierGatewayMock1>();
             services.AddSingleton<ISupplierGateway, SupplierGatewayMock2>();
             services.AddSingleton<ISupplierGateway, SupplierGatewayMock3>();
