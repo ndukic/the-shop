@@ -9,7 +9,7 @@ namespace TheShop.Domain.Model
         public Guid CustomerRef { get; set; }
         public double TotalPrice { get; set; }
         public DateTime CreatedDate { get; set; }
-        public OrderState OrderState { get; set; }
+        public OrderState OrderStatus { get; set; }
         public IEnumerable<OrderItem> OrderItems { get; set; }
     }
 }

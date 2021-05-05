@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using TheShop.Domain.Contract;
 using TheShop.Domain.Model;
 
 namespace TheShop.Domain
 {
     public interface IShopService
     {
-        void OrderAndSellArticle(int id, int maxExpectedPrice, int buyerId);
-        Article GetById(int id);
+        //Article GetById(int id);
 
         // Customer should be able to browse articles catalog
         IEnumerable<Article> GetArticles(ArticleQuery query);
@@ -16,7 +16,7 @@ namespace TheShop.Domain
 
         // BASKET
         // Customer should be able to add articles to the basket
-        void AddArticleToBasket(Article article, int count, Guid customerRef);
+        void AddArticleToTheBasket(Article article, int count, Guid customerRef);
         // Customer should be able to remove items from the basket
         void RemoveBasketItem(Guid basketItemRef);
         // Customer should be able to edit basket item (e.g. change count)
@@ -28,7 +28,7 @@ namespace TheShop.Domain
 
         // ORDER
         // Customer should be able to make Order from Basket
-        void CreateOrder(Guid customerRef);
+        void PlaceOrder(Basket basket, Guid customerRef);
         // Customer should be able to get his order (e.g. to check the status)
         Order GetOrder(Guid orderRef);
         // Customer should be able to get his order history. OrderQuery should be used for filtering (e.g. set page, set date range, etc)

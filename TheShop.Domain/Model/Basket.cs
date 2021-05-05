@@ -7,7 +7,7 @@ namespace TheShop.Domain.Model
     public class Basket
     {
         public Guid CustomerRef { get; set; }
-        public ICollection<BasketItem> BasketItems { get; set; }
-        public double TotalPrice => BasketItems.Select(x => x.Count * x.Price).Sum();
+        public IEnumerable<BasketItem> BasketItems { get; set; }
+        public double TotalPrice => BasketItems.Select(x => x.Count * x.UnitPrice).Sum();
     }
 }

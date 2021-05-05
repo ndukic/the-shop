@@ -15,7 +15,7 @@ namespace TheShop
 			var logger = serviceProvider.GetService<ILogger<Program>>();
 			logger.LogInformation("Application start");
 
-			serviceProvider.GetService<Client>().UseShopService();
+			//serviceProvider.GetService<Client>().UseShopService();
 
 			logger.LogInformation("Application end");
 

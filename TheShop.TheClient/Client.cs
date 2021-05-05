@@ -17,37 +17,37 @@ namespace TheShop.TheClient
 
         public void UseShopService()
         {
-			try
-			{
-				//order and sell
-				_shopService.OrderAndSellArticle(1, 20, 10);
-			}
-			catch (Exception ex)
-			{
-				_logger.LogWarning(ex, "OrderAndSellArticle failed");
-			}
+			//try
+			//{
+			//	//order and sell
+			//	_shopService.OrderAndSellArticle(1, 20, 10);
+			//}
+			//catch (Exception ex)
+			//{
+			//	_logger.LogWarning(ex, "OrderAndSellArticle failed");
+			//}
 
-			try
-			{
-				//print article
-				var article = _shopService.GetById(1);
-				_logger.LogInformation($"Found article with ID:{article.Id}");
-			}
-			catch (Exception ex)
-			{
-				_logger.LogWarning($"Article not found: {ex}");
-			}
+			//try
+			//{
+			//	//print article
+			//	var article = _shopService.GetById(1);
+			//	_logger.LogInformation($"Found article with ArticleRef:{article.ArticleRef}");
+			//}
+			//catch (Exception ex)
+			//{
+			//	_logger.LogWarning($"Article not found: {ex}");
+			//}
 
-			try
-			{
-				//print article				
-				var article = _shopService.GetById(12);
-				_logger.LogInformation($"Found article with ID:{article.Id}");
-			}
-			catch (Exception ex)
-			{
-				_logger.LogWarning($"Article not found: {ex}");
-			}
+			//try
+			//{
+			//	//print article				
+			//	var article = _shopService.GetById(12);
+			//	_logger.LogInformation($"Found article with ArticleRef:{article.ArticleRef}");
+			//}
+			//catch (Exception ex)
+			//{
+			//	_logger.LogWarning($"Article not found: {ex}");
+			//}
 		}
     }
 }

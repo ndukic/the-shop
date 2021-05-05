@@ -1,10 +1,13 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using TheShop.Domain.Commands;
+using System.Linq;
+using TheShop.Domain.Contract;
 using TheShop.Domain.Exceptions;
+using TheShop.Domain.Helpers;
 using TheShop.Domain.Model;
-using TheShop.Domain.Queries;
+using TheShop.Domain.Repositories;
+using TheShop.Domain.Service;
 
 namespace TheShop.Domain
 {
@@ -12,121 +15,118 @@ namespace TheShop.Domain
 	{
 		private readonly ILogger<ShopService> _logger;
 
-		private readonly ISupplierService _supplierOrchestrator;
-		private readonly IArticleCreator _articleCreator;
-		private readonly IArticleReader _articleReader;
-		private readonly IOrderCreator _orderCreator;
+        private readonly ICatalogService _catalogService;
+        private readonly IBasketRepository _basketRepository;
+        private readonly IBasketReader _basketReader;
+        private readonly IOrderRepository _orderRepository;
 
-		public ShopService(ILogger<ShopService> logger,
-			IArticleCreator articleCreator,
-			IArticleReader articleReader,
-			IOrderCreator orderCreator,
-			ISupplierService supplierOrchestrator)
+        public ShopService(ILogger<ShopService> logger,
+            ICatalogService catalogService,
+            IBasketRepository basketRepository,
+            IBasketReader basketReader,
+            IOrderRepository orderRepository)
 		{	
 			_logger = logger;
-			_articleCreator = articleCreator;
-			_articleReader = articleReader;
-			_orderCreator = orderCreator;
-			_supplierOrchestrator = supplierOrchestrator;
-		}
-
-		public void OrderAndSellArticle(int id, int maxExpectedPrice, int buyerId)
-		{
-            try
-            {
-				var article = TryOrderArticle(id, maxExpectedPrice);
-				TrySellArticle(article, buyerId);
-			}
-            catch (ArticleNotFoundException notFound)
-            {
-				_logger.LogWarning($"Unable to get article with id:{id}. ", notFound);
-                throw;
-            }
-			catch (Exception e)
-            {
-				_logger.LogError($"Unknown error happened while trying to order. Exception: ", e);
-			}
-		}
-
-		public Article TryOrderArticle(int id, int maxExpectedPrice)
-        {
-			_logger.LogDebug($"Trying to order article with id:{id} from supplier");
-			return _supplierOrchestrator.GetArticle(id, maxExpectedPrice);
+            _catalogService = catalogService;
+            _basketRepository = basketRepository;
+            _basketReader = basketReader;
+            _orderRepository = orderRepository;
         }
-
-		public void TrySellArticle(Article article, int buyerId)
-        {
-			_logger.LogDebug($"Trying to sell article with ref:{article.ArticleRef} to customer with id:{buyerId}");
-
-			var order = CreateOrder(article, buyerId);
-
-			try
-            {
-				_articleCreator.Save(article);
-				_orderCreator.Save(order);
-                _logger.LogInformation($"Article with ref:{article.ArticleRef} is sold. Order ref:{order.OrderRef}");
-            }
-            catch (ArgumentNullException ex)
-            {
-                _logger.LogError($"Could not save order");
-                throw new Exception("Could not save order");
-            }
-            catch (Exception)
-            {
-            }
-        }
-
-		public Article GetById(int id)
-		{
-			return _articleReader.GetById(id);
-		}
-
-		private Order CreateOrder(Article article, long buyerId)
-        {
-			return new Order()
-			{
-				CreatedDate = DateTime.Now
-			};
-		}
 
         public IEnumerable<Article> GetArticles(ArticleQuery query)
         {
-            throw new NotImplementedException();
+            return _catalogService.GetArticles(query);
         }
 
-        public void AddArticleToBasket(Article article, int count, Guid customerRef)
+        public void AddArticleToTheBasket(Article article, int count, Guid customerRef)
         {
-            throw new NotImplementedException();
+            var basketItem = BuildBasketItem(article, count, customerRef);
+            _basketRepository.CreateBasketItem(basketItem);
         }
 
         public void RemoveBasketItem(Guid basketItemRef)
         {
-            throw new NotImplementedException();
+            _basketRepository.RemoveBasketItem(basketItemRef);
         }
 
         public void EditBasketItem(BasketItem basketItem)
         {
-            throw new NotImplementedException();
+            _basketRepository.UpdateBasketItem(basketItem);
         }
 
         public Basket GetBasket(Guid customerRef)
         {
-            throw new NotImplementedException();
+            return _basketReader.GetBasketByCustomerRef(customerRef);
         }
 
         public void ClearBasket(Guid customerRef)
         {
-            throw new NotImplementedException();
+            _basketRepository.RemoveAllBasketItems(customerRef);
         }
 
-        public void CreateOrder(Guid customerRef)
+        public void PlaceOrder(Basket basket, Guid customerRef)
         {
-            throw new NotImplementedException();
+            if (!basket.BasketItems.Any())
+            {
+                _logger.LogInformation($"Order was not created because basket is empty");
+                throw new BasketIsEmptyException();
+            }
+
+            Order order = BuildOrder(customerRef);
+            var createdOrder = _orderRepository.CreateOrder(order);
+
+            SaveOrderItems(basket, createdOrder);
+
+            // TODO: initiate each article availability check
+            // TODO: after availability is confirmed, initiate shipping - we draw the line here, shipping is another service
+            // TODO(bonus): Make event handler after order have been shipped to update the status
         }
 
         public Order GetOrder(Guid orderRef)
         {
-            throw new NotImplementedException();
+            _logger.LogDebug($"Fetch order with items, orderRef: {orderRef}");
+            return _orderRepository.GetOrderWithItemsByOrderRef(orderRef);
+        }
+
+        private BasketItem BuildBasketItem(Article article, int count, Guid customerRef)
+        {
+            var basketItem = MapArticleToBasketItem(article);
+            basketItem.Count = count;
+            basketItem.CustomerRef = customerRef;
+            return basketItem;
+        }
+
+        private BasketItem MapArticleToBasketItem(Article article)
+        {
+            return new BasketItem()
+            {
+                ArticleRef = article.ArticleRef,
+                Name = article.Name,
+                UnitPrice = article.Price
+            };
+        }
+
+        private Order BuildOrder(Guid customerRef)
+        {
+            var order = new Order();
+            order.CustomerRef = customerRef;
+            order.OrderStatus = OrderState.ORDER_CREATED;
+            return order;
+        }
+
+        private void SaveOrderItems(Basket basket, Order createdOrder)
+        {
+            foreach (var basketItem in basket.BasketItems)
+            {
+                var orderItem = new OrderItem();
+                orderItem.OrderRef = createdOrder.OrderRef;
+                orderItem.ArticleRef = basketItem.ArticleRef;
+                orderItem.Count = basketItem.Count;
+                orderItem.Name = basketItem.Name;
+                orderItem.UnitPrice = basketItem.UnitPrice;
+
+                _orderRepository.CreateOrderItem(orderItem);
+            }
         }
     }
 }
