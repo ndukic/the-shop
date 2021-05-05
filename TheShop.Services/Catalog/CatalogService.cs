@@ -29,7 +29,7 @@ namespace TheShop.Services.Catalog
         public void RefreshCatalog()
         {
             _logger.LogDebug($"Refreshing articles data");
-            // Occasionally refreshes Article repository
+            // TODO: Query suppliers for articles catalog if our Article repo is empty
         }
     }
 }

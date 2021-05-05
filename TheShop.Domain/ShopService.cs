@@ -35,6 +35,10 @@ namespace TheShop.Domain
 
         public IEnumerable<Article> GetArticles(ArticleQuery query)
         {
+            if (query == null)
+            {
+                query = new ArticleQuery();
+            }
             return _catalogService.GetArticles(query);
         }
 
@@ -66,26 +70,32 @@ namespace TheShop.Domain
 
         public void PlaceOrder(Basket basket, Guid customerRef)
         {
-            if (!basket.BasketItems.Any())
-            {
-                _logger.LogInformation($"Order was not created because basket is empty");
-                throw new BasketIsEmptyException();
-            }
+            CheckBasket(basket);
 
             Order order = BuildOrder(customerRef);
             var createdOrder = _orderRepository.CreateOrder(order);
 
             SaveOrderItems(basket, createdOrder);
 
-            // TODO: initiate each article availability check
-            // TODO: after availability is confirmed, initiate shipping - we draw the line here, shipping is another service
-            // TODO(bonus): Make event handler after order have been shipped to update the status
+            ClearBasket(customerRef);
+
+            // TODO: initiate articles reservation using supplier service
+            // TODO: after availability is confirmed, initiate shipping, otherwise cancel order
         }
 
         public Order GetOrder(Guid orderRef)
         {
             _logger.LogDebug($"Fetch order with items, orderRef: {orderRef}");
             return _orderRepository.GetOrderWithItemsByOrderRef(orderRef);
+        }
+
+        private void CheckBasket(Basket basket)
+        {
+            if (!basket.BasketItems.Any())
+            {
+                _logger.LogInformation($"Order was not created because basket is empty");
+                throw new BasketIsEmptyException();
+            }
         }
 
         private BasketItem BuildBasketItem(Article article, int count, Guid customerRef)

@@ -28,7 +28,7 @@ namespace TheShop
             ConfigureShopServices.Configure(services);
             ConfigureDomain.Configure(services);
 
-            services.AddTransient<Client>();
+            services.AddTransient<TestClient>();
 
             return services;
         }

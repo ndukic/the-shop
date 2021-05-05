@@ -15,11 +15,21 @@ namespace TheShop
 			var logger = serviceProvider.GetService<ILogger<Program>>();
 			logger.LogInformation("Application start");
 
-			//serviceProvider.GetService<Client>().UseShopService();
+			System.AppDomain.CurrentDomain.UnhandledException += UnhandledExceptionResolver;
 
-			logger.LogInformation("Application end");
+			serviceProvider.GetService<TestClient>().UseShopService();
+
+            logger.LogInformation("Application end");
 
 			Console.ReadKey();
+		}
+
+		static void UnhandledExceptionResolver(object sender, UnhandledExceptionEventArgs e)
+		{
+			Console.WriteLine(e.ExceptionObject.ToString());
+			Console.WriteLine("Press Enter to Exit");
+			Console.ReadKey();
+			Environment.Exit(0);
 		}
 	}
 }

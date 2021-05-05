@@ -25,7 +25,9 @@ namespace TheShop.Dal.InMemory.Repositories
         public Article CreateArticle(Article article)
         {
             _logger.LogDebug($"Creating article: {article}");
-            return _context.Articles.Add(article).Entity;
+            var created = _context.Articles.Add(article).Entity;
+            _context.SaveChanges();
+            return created;
         }
 
         public Article GetArticle(Guid articleRef)
@@ -48,6 +50,7 @@ namespace TheShop.Dal.InMemory.Repositories
             _logger.LogDebug($"Removing article with articleRef: {articleRef}");
             var articleToRemove = _context.Articles.FirstOrDefault(x => x.ArticleRef == articleRef);
             _context.Articles.Remove(articleToRemove);
+            _context.SaveChanges();
         }
 
         public void UpdateArticle(Article article)

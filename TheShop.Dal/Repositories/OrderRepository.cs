@@ -22,13 +22,16 @@ namespace TheShop.Dal.InMemory.Repositories
         {
             order.OrderRef = Guid.NewGuid();
             order.CreatedDate = DateTime.Now;
-            return _context.Orders.Add(order).Entity;
+            var created = _context.Orders.Add(order).Entity;
+            _context.SaveChanges();
+            return created;
         }
 
         public void CreateOrderItem(OrderItem orderItem)
         {
             orderItem.OrderItemRef = Guid.NewGuid();
             _context.OrderItems.Add(orderItem);
+            _context.SaveChanges();
         }
 
         public Order GetOrderByOrderRef(Guid orderRef)

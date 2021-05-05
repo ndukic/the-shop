@@ -11,7 +11,7 @@ namespace TheShop.Domain.Service
         bool IsArticleAvailable(Guid articleRef);
 
 
-        // Mechanism to order all articles or none
+        // TODO: Mechanism to order all articles or none
         //Tuple<Guid, Guid?> ReserveArticles(Tuple<Guid, int>[] articleRefsAndCounts); // <articleRef, reservationRef> - reservationRef is null if unsuccessful
         //void ConfirmReservations(Guid[] reservationRefs);
         //void CancelReservations(Guid[] reservationRefs);

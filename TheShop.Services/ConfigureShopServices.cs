@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using TheShop.Domain.Service;
+using TheShop.Services.Catalog;
 using TheShop.Services.Supplier;
 
 namespace TheShop.Services
@@ -8,6 +9,7 @@ namespace TheShop.Services
     {
         public static void Configure(IServiceCollection services)
         {
+            services.AddTransient<ICatalogService, CatalogService>();
             services.AddSingleton<ISupplierService, SupplierService>();
             //services.AddSingleton<ISupplierGateway, SupplierGatewayMock1>();
             //services.AddSingleton<ISupplierGateway, SupplierGatewayMock2>();

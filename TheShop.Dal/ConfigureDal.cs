@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using TheShop.Dal.InMemory.Repositories;
 using TheShop.Domain.Repositories;
-using TheShop.Services.Catalog;
 
 namespace TheShop.Dal.InMemory
 {
@@ -9,7 +9,8 @@ namespace TheShop.Dal.InMemory
     {
         public static void Configure(IServiceCollection services)
         {
-            services.AddSingleton<TheShopDbContext>();
+            services.AddDbContext<TheShopDbContext>(options => options.UseInMemoryDatabase("TheShopDatabase"));
+            //services.AddSingleton<TheShopDbContext>();
             services.AddSingleton<IArticleRepository, ArticleRepository>();
             services.AddSingleton<IBasketRepository, BasketRepository>();
             services.AddSingleton<IOrderRepository, OrderRepository>();

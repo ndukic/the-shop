@@ -23,7 +23,9 @@ namespace TheShop.Dal.InMemory.Repositories
         {
             _logger.LogDebug($"Creating basket item: {basketItem}");
             basketItem.BasketItemRef = Guid.NewGuid();
-            return _context.BasketItems.Add(basketItem).Entity;
+            var createdItem = _context.BasketItems.Add(basketItem).Entity;
+            _context.SaveChanges();
+            return createdItem;
         }
 
         public void UpdateBasketItem(BasketItem basketItem)
@@ -44,6 +46,7 @@ namespace TheShop.Dal.InMemory.Repositories
             _logger.LogDebug($"Removing basket items for customerRef: {customerRef}");
             var itemsToDelete = _context.BasketItems.Where(x => x.CustomerRef == customerRef);
             _context.BasketItems.RemoveRange(itemsToDelete);
+            _context.SaveChanges();
         }
 
         public void RemoveBasketItem(Guid basketItemRef)
@@ -51,6 +54,7 @@ namespace TheShop.Dal.InMemory.Repositories
             _logger.LogDebug($"Removing basket item with basketItemRef: {basketItemRef}");
             var itemToDelete = _context.BasketItems.Where(x => x.BasketItemRef == basketItemRef);
             _context.Remove(itemToDelete);
+            _context.SaveChanges();
         }
     }
 }

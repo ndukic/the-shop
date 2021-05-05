@@ -1,93 +1,156 @@
-//using AutoFixture;
-//using AutoFixture.AutoMoq;
-//using Moq;
-//using NUnit.Framework;
-//using System;
-//using TheShop.Domain.Exceptions;
-//using TheShop.Domain.Model;
+using AutoFixture;
+using AutoFixture.AutoMoq;
+using Moq;
+using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using TheShop.Domain.Exceptions;
+using TheShop.Domain.Helpers;
+using TheShop.Domain.Model;
+using TheShop.Domain.Repositories;
+using TheShop.Domain.Service;
 
-//namespace TheShop.Domain.Tests
-//{
-//    public class ShopServiceTests
-//    {
-//        private IFixture _fixture;
-//        private Mock<ISupplierService> _supplierService;
-//        private ShopService _sut;
+namespace TheShop.Domain.Tests
+{
+    public class ShopServiceTests
+    {
+        private IFixture _fixture;
+        private Mock<ICatalogService> _catalogService;
+        private Mock<IBasketRepository> _basketRepository;
+        private Mock<IBasketReader> _basketReader;
+        private Mock<IOrderRepository> _orderRepository;
+        private ShopService _sut;
+        private Guid _customerRef = Guid.Parse("fae20b38-5186-482b-82f3-0af196374a54");
 
-//        [SetUp]
-//        public void Setup()
-//        {
-//            _fixture = new Fixture().Customize(new AutoMoqCustomization());
+        [SetUp]
+        public void Setup()
+        {
+            _fixture = new Fixture().Customize(new AutoMoqCustomization());
 
-//            _supplierService = new Mock<ISupplierService>();
+            _catalogService = new Mock<ICatalogService>();
+            _basketRepository = new Mock<IBasketRepository>();
+            _basketReader = new Mock<IBasketReader>();
+            _orderRepository = new Mock<IOrderRepository>();
 
-//            _fixture.Inject(_supplierService);
+            _fixture.Inject(_catalogService);
+            _fixture.Inject(_basketRepository);
+            _fixture.Inject(_basketReader);
+            _fixture.Inject(_orderRepository);
 
-//            _sut = _fixture.Create<ShopService>();
-//        }
+            _sut = _fixture.Create<ShopService>();
+        }
 
-//        [Test]
-//        public void Rethrows_ArticleNotFoundException()
-//        {
-//            Arrange_Exception_On_GetArticle();
+        [Test]
+        public void AddArticleToBasketCallsBasketRepositoryAsExpected()
+        {
+            var article = CreateArticle();
 
-//            try
-//            {
-//                _sut.OrderAndSellArticle(1, 2, 3);
-//                Assert.Fail();
-//            }
-//            catch (ArticleNotFoundException)
-//            {
-//            }
-//        }
+            _sut.AddArticleToTheBasket(article, 5, _customerRef);
 
-//        [Test]
-//        public void Saves_Article_On_Successful_Sale()
-//        {
-//            var article = CreateArticle();
+            _basketRepository.Verify(x => x.CreateBasketItem(It.IsAny<BasketItem>()));
+        }
 
-//            _sut.TrySellArticle(article, 555);
+        [Test]
+        public void PlacingOrderWhenBasketIsEmptyThrowsException()
+        {
+            var basket = new Basket();
+            basket.BasketItems = new List<BasketItem>();
 
-//            _articleCreator.Verify(x => x.Save(It.IsAny<Article>()), Times.Once());
-//        }
+            Assert.Throws<BasketIsEmptyException>(() => _sut.PlaceOrder(basket, _customerRef));
+        }
 
-//        [Test]
-//        public void Saves_Order_On_Successful_Sale()
-//        {
-//            var article = CreateArticle();
+        [Test]
+        public void PlacingOrderCallsOrderRepositoryToSaveOrder()
+        {
+            Basket basket = PrepareBasketWithOneItem();
+            _orderRepository.Setup(x => x.CreateOrder(It.IsAny<Order>())).Returns(new Order());
 
-//            _sut.TrySellArticle(article, 555);
+            _sut.PlaceOrder(basket, _customerRef);
 
-//            _orderCreator.Verify(x => x.Save(It.IsAny<Order>()), Times.Once());
-//        }
+            _orderRepository.Verify(x => x.CreateOrder(It.IsAny<Order>()));
+        }
 
-//        [Test]
-//        public void Throws_ArgumentNullException_On_Null_Article_Save()
-//        {
-//            Assert.Throws<NullReferenceException>(() => _sut.TrySellArticle(null, 321));
-//        }
+        [Test]
+        public void PlacingOrderCallsOrderRepositoryToSaveOrderItem()
+        {
+            Basket basket = PrepareBasketWithOneItem();
+            _orderRepository.Setup(x => x.CreateOrder(It.IsAny<Order>())).Returns(new Order());
 
-//        [Test]
-//        public void Return_Null_When_Get_NonExisting_Article()
-//        {
-//            _articleReader.Setup(x => x.GetById(6)).Returns((Article)null);
+            _sut.PlaceOrder(basket, _customerRef);
 
-//            var actualResult = _sut.GetById(6);
+            _orderRepository.Verify(x => x.CreateOrderItem(It.IsAny<OrderItem>()));
+        }
 
-//            Assert.IsNull(actualResult);
-//        }
+        [Test]
+        public void PlacingOrderCallsClearBasket()
+        {
+            Basket basket = PrepareBasketWithOneItem();
+            _orderRepository.Setup(x => x.CreateOrder(It.IsAny<Order>())).Returns(new Order());
 
-//        private void Arrange_Exception_On_GetArticle()
-//        {
-//            _supplierService.Setup(x => x.GetArticle(It.IsAny<long>(), It.IsAny<double>())).Throws(new ArticleNotFoundException());
-//        }
-        
-//        private Article CreateArticle()
-//        {
-//            return new Article()
-//            {
-//                Id = 111
-//            };
-//        }
-//    }
-//}
+            _sut.PlaceOrder(basket, _customerRef);
+
+            _basketRepository.Verify(x => x.RemoveAllBasketItems(_customerRef));
+        }
+
+        [Test]
+        public void GetBasketCallsBasketReader()
+        {
+            _sut.GetBasket(_customerRef);
+
+            _basketReader.Verify(x => x.GetBasketByCustomerRef(_customerRef));
+        }
+
+        [Test]
+        public void RemoveBasketItemsCallsBasketRepository()
+        {
+            var basketItemRef = Guid.NewGuid();
+
+            _sut.RemoveBasketItem(basketItemRef);
+
+            _basketRepository.Verify(x => x.RemoveBasketItem(basketItemRef));
+        }
+
+        [Test]
+        public void EditBasketItemCallsBasketRepository()
+        {
+            var basketItem = CreateBasketItem();
+
+            _sut.EditBasketItem(basketItem);
+
+            _basketRepository.Verify(x => x.UpdateBasketItem(basketItem));
+        }
+
+        private Article CreateArticle()
+        {
+            return new Article()
+            {
+                ArticleRef = Guid.Parse("6092fd54-95af-443e-a057-e5d1d00b4ccb"),
+                Name = "Test Article",
+                Price = 6.99
+            };
+        }
+
+        private BasketItem CreateBasketItem()
+        {
+            return new BasketItem()
+            {
+                BasketItemRef = Guid.NewGuid(),
+                ArticleRef = Guid.NewGuid(),
+                CustomerRef = _customerRef,
+                Name = "Test Article",
+                UnitPrice = 6.99,
+                Count = 2
+            };
+        }
+
+        private Basket PrepareBasketWithOneItem()
+        {
+            var basket = new Basket();
+            var basketItem = CreateBasketItem();
+            var list = new List<BasketItem>();
+            list.Add(basketItem);
+            basket.BasketItems = list;
+            return basket;
+        }
+    }
+}
